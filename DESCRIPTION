@@ -7,9 +7,20 @@ Description: Contains the Loqui Shiny app reimagined with the {golem}
     framework.
 License: MIT + file LICENSE
 Imports: 
+    ari,
+    blastula,
     config,
+    dplyr,
     golem,
-    shiny
+    googlesheets4,
+    gsplyr (>= 0.0.0.9000),
+    pdftools,
+    ptplyr (>= 0.0.0.9000),
+    readr,
+    shiny,
+    shinyFeedback,
+    shinyjs,
+    shinyWidgets
 Suggests: 
     spelling,
     testthat (>= 3.0.0)
@@ -18,3 +29,6 @@ Encoding: UTF-8
 Language: en-US
 LazyData: true
 RoxygenNote: 7.3.2
+Remotes:  
+    fhdsl/gsplyr,
+    fhdsl/ptplyr

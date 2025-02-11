@@ -13,6 +13,24 @@
 
 # Engineering
 
+usethis::use_package("shinyjs")
+usethis::use_package("shinyWidgets")
+usethis::use_package("shinyFeedback")
+usethis::use_package("ari")
+
+usethis::use_package("dplyr")
+usethis::use_package("readr")
+usethis::use_package("pdftools")
+
+usethis::use_package("blastula")
+usethis::use_package("googlesheets4")
+
+
+## PPTX/Google Slide manipulation
+usethis::use_dev_package("gsplyr")
+usethis::use_dev_package("ptplyr")
+
+
 ## Dependencies ----
 ## Amend DESCRIPTION with dependencies read from package code parsing
 ## install.packages('attachment') # if needed.
@@ -20,8 +38,11 @@ attachment::att_amend_desc()
 
 ## Add modules ----
 ## Create a module infrastructure in R/
-golem::add_module(name = "name_of_module1", with_test = TRUE) # Name of the module
-golem::add_module(name = "name_of_module2", with_test = TRUE) # Name of the module
+golem::add_module(name = "titlePanel", with_test = FALSE) # Name of the module
+golem::add_module(name = "sidebarPanel", with_test = FALSE) # Name of the module
+golem::add_module(name = "mainPanel", with_test = FALSE) # Name of the module
+golem::add_module(name = "test", with_test = FALSE) # Name of the module
+
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*
@@ -30,11 +51,11 @@ golem::add_utils("helpers", with_test = TRUE)
 
 ## External resources
 ## Creates .js and .css files at inst/app/www
-golem::add_js_file("script")
-golem::add_js_handler("handlers")
-golem::add_css_file("custom")
-golem::add_sass_file("custom")
-golem::add_any_file("file.json")
+# golem::add_js_file("script")
+# golem::add_js_handler("handlers")
+golem::add_css_file("hutch_theme")
+# golem::add_sass_file("custom")
+golem::add_html_template("include-about.html")
 
 ## Add internal datasets ----
 ## If you have data in your package
