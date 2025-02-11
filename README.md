@@ -11,7 +11,7 @@
 You can install the development version of `{loqui.golem}` like so:
 
 ``` r
-# FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
+remotes::install_github("howardbaik/loqui.golem")
 ```
 
 ## Run
