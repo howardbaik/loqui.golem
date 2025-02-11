@@ -43,7 +43,7 @@ mod_mainPanel_ui <- function(id) {
 #' mainPanel Server Functions
 #'
 #' @noRd
-mod_mainPanel_server <- function(id) {
+mod_mainPanel_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 

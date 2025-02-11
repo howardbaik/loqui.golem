@@ -49,7 +49,7 @@ mod_sidebarPanel_ui <- function(id) {
 #' Sidebar Panel Server Functions
 #'
 #' @noRd
-mod_sidebarPanel_server <- function(id) {
+mod_sidebarPanel_server <- function(id, r) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
@@ -80,9 +80,92 @@ mod_sidebarPanel_server <- function(id) {
       }
     })
 
+    # Create unique name for video file
+    video_name <- eventReactive(input$generate, {
+      current_time <- Sys.time()
+      current_time <- format(current_time, "%Y-%m-%d-%H-%M-%S")
+      unique_file_name <- paste0("www/ari-video-", current_time, ".mp4")
+
+      unique_file_name
+    })
+
+    # Video with subtitles
+    video_name_subtitle <- eventReactive(input$burn_subtitle, {
+      # create unique name for video file
+      current_time <- Sys.time()
+      current_time <- format(current_time, "%Y-%m-%d-%H-%M-%S")
+      unique_file_name <- paste0("www/subtitled-ari-video-", current_time, ".mp4")
+
+      unique_file_name
+    })
+
+    # Generate video
+    observeEvent(input$generate, {
+
+      # Read inputs to be used inside future_promise()
+      service <- input$service
+      coqui_model_name <- input$coqui_model_name
+      coqui_vocoder_name <- switch(coqui_model_name,
+                                   "jenny" = "jenny",
+                                   "tacotron2-DDC_ph" = "ljspeech/univnet",
+                                   "fast_pitch" = "ljspeech/hifigan_v2",
+                                   stop("Invalid model name"))
+
+      which_tool <- input$presentation_tool
+      burn_subtitle <- input$burn_subtitle
+      gs_url <- input$gs_url
+      pptx_upload_datapath <- input$pptx_file$datapath
+      user_email <- input$email
+      auto_email <- input$auto_email
+      video_name <- video_name()
+      video_name_subtitle <- video_name_subtitle()
+      app_url <- "https://loqui.fredhutch.org"
+      # download google slides as pptx
+      if(which_tool == "google_slides") {
+        pptx_path <- gsplyr::download(gs_url, type = "pptx")
+      } else {
+        # or fetch path to pptx on server
+        pptx_path <- pptx_upload_datapath
+      }
+      pptx_notes_vector <- ptplyr::extract_notes(pptx_path)
+
+      # download google slides as pdf
+      if (which_tool == "google_slides") {
+        pdf_path <- gsplyr::download(gs_url, type = "pdf")
+      } else {
+        # convert pptx slides to pdf
+        if (Sys.info()['sysname'] == "Linux") {
+          Sys.setenv(LD_LIBRARY_PATH="")
+        }
+        pdf_path <- ptplyr::convert_pptx_pdf(pptx_upload_datapath)
+      }
+
+      pdf_info <- pdftools::pdf_info(pdf = pdf_path)
+      video_title <- pdf_info$keys$Title
 
 
 
+      image_path <- ptplyr::convert_pdf_png(pdf_path)
 
+      # ari_spin()----
+      ari::ari_spin(images = image_path,
+                    paragraphs = pptx_notes_vector,
+                    output = video_name,
+                    tts_engine_args = ari::coqui_args(coqui_model_name,
+                                                      coqui_vocoder_name),
+                    subtitles = TRUE)
+
+      # Final output
+      # Replace "www" with "i"
+      if (burn_subtitle) {
+        rendered_video_path <- gsub("www", "i", video_name_subtitle)
+      } else {
+        rendered_video_path <- gsub("www", "i", video_name)
+      }
+
+      final_res <- c(rendered_video_path, video_title)
+
+      r(final_res)
+    })
   })
 }
